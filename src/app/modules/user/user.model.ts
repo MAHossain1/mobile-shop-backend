@@ -3,34 +3,12 @@ import bcrypt from 'bcrypt';
 import { model, Schema } from 'mongoose';
 import config from '../../config';
 import { Roles } from './user.constant';
-import { TUser, TUserName, UserModel } from './user.interface';
-
-const userNameSchema = new Schema<TUserName>(
-  {
-    firstName: {
-      type: String,
-      required: [true, 'First Name is required'],
-      trim: true,
-    },
-    middleName: {
-      type: String,
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: [true, 'First Name is required'],
-      trim: true,
-    },
-  },
-  {
-    _id: false,
-  }
-);
+import { TUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<TUser, UserModel>(
   {
     name: {
-      type: userNameSchema,
+      type: String,
       required: [true, 'User name is required.'],
     },
     email: {
@@ -42,20 +20,13 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       required: true,
     },
-    phone: {
-      type: String,
-      required: true,
-    },
     role: {
       type: String,
+      default: 'user',
       enum: {
         values: Roles,
         message: `{VALUE} is not a valid role.`,
       },
-    },
-    address: {
-      type: String,
-      required: true,
     },
   },
   {
@@ -73,12 +44,7 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
-// userSchema.post('save', async function (doc, next) {
-//   doc.password = '';
-//   next();
-// });
 
-// Use toJSON or toObject to hide the password field
 userSchema.set('toJSON', {
   transform: function (doc, ret) {
     delete ret.password;
@@ -86,7 +52,7 @@ userSchema.set('toJSON', {
   },
 });
 
-// use toObject to hide the password fiel
+// use toObject to hide the password field
 userSchema.set('toObject', {
   transform: function (doc, ret) {
     delete ret.password;
