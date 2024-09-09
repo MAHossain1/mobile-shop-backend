@@ -13,4 +13,12 @@ router.post(
 
 router.put('/:id', auth(USER_ROLE.admin), OrderControllers.updateOrderStatus);
 
+router.get('/my-orders', auth(USER_ROLE.user), OrderControllers.getUserOrders);
+
+router.post(
+  '/add-rating',
+  auth(USER_ROLE.user),
+  OrderControllers.addRatingForDeliveredProduct
+);
+
 export const OrderRoutes = router;
