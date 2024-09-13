@@ -6,7 +6,15 @@ import globalErrorHandler from './app/config/middlewares/globalErrorHandler';
 const app: Application = express();
 
 app.use(express.json());
-app.use(cors());
+
+const corsOptions = {
+  origin: 'http://localhost:3000', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Allowed HTTP methods
+  credentials: true, // Allow credentials like cookies and headers
+};
+
+// Use the CORS middleware with options
+app.use(cors(corsOptions));
 
 app.use('/api/v1', router);
 

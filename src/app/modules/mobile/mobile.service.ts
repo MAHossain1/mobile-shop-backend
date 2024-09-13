@@ -9,6 +9,18 @@ const createMobileIntoDB = async (payload: TMobile) => {
   return result;
 };
 
+const getAllMobiles = async () => {
+  const mobiles = await Mobile.find();
+
+  return mobiles;
+};
+
+const getSingleMobile = async (id: string) => {
+  const mobiles = await Mobile.findById(id);
+
+  return mobiles;
+};
+
 const updateAMobileIntoDB = async (
   MobileId: string,
   payload: Partial<TMobile>
@@ -34,6 +46,8 @@ const deleteAMobileFromDB = async (MobileId: string) => {
 
 export const MobileServices = {
   createMobileIntoDB,
+  getAllMobiles,
+  getSingleMobile,
   updateAMobileIntoDB,
   deleteAMobileFromDB,
 };

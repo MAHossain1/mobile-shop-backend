@@ -15,6 +15,29 @@ const createMobile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllMobiles = catchAsync(async (req: Request, res: Response) => {
+  const result = await MobileServices.getAllMobiles();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Retrieved all mobiles successfully done.',
+    data: result,
+  });
+});
+
+const getSingleMobile = catchAsync(async (req: Request, res: Response) => {
+  const { mobileId } = req.params;
+  const result = await MobileServices.getSingleMobile(mobileId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Retrieved a mobile successfully done.',
+    data: result,
+  });
+});
+
 const updateAMobile = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await MobileServices.updateAMobileIntoDB(id, req.body);
@@ -41,6 +64,8 @@ const deleteAMobile = catchAsync(async (req: Request, res: Response) => {
 
 export const MobileControllers = {
   createMobile,
+  getAllMobiles,
+  getSingleMobile,
   updateAMobile,
   deleteAMobile,
 };

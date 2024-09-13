@@ -11,4 +11,6 @@ router.post(
   RatingControllers.createRating
 );
 
+router.get('/:productId', RatingControllers.getReviewsByProductId);
+
 export const RatingRoutes = router;

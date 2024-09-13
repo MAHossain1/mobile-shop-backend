@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { TOrder } from './order.interface';
@@ -5,16 +6,62 @@ import { Order } from './order.model';
 import { User } from '../user/user.model';
 import { Mobile } from '../mobile/mobile.model';
 import { IRating, Rating } from '../rating/rating.model';
+import mongoose from 'mongoose';
 
-const createOrderIntoDB = async (payload: TOrder) => {
-  const result = await Order.create(payload);
+const createOrderIntoDB = async (payload: TOrder, email: string) => {
+  // console.log({ payload });
+  const user = await User.findOne({ email }, { _id: 1 });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found.');
+  }
+  const userId = user?._id.toString();
+  // console.log(userId);
 
-  return result;
+  let totalPrice = 0;
+
+  const productDetails = await Promise.all(
+    payload.products.map(async (item: any) => {
+      // Cast the string productId to ObjectId if necessary
+      // console.log(item, 'from backd prd');
+      const productId = new mongoose.Types.ObjectId(item.productId);
+
+      // Find the product by its ID
+      const product = await Mobile.findById({ _id: productId });
+      if (product) {
+        totalPrice += product.price * item.quantity; // Accumulate total price
+        return {
+          productId: product._id,
+          quantity: item.quantity,
+        };
+      } else {
+        throw new Error('Product not found');
+      }
+    })
+  );
+
+  const order = new Order({
+    userId,
+    products: productDetails,
+    totalAmount: totalPrice,
+    status: payload.order_status || 'Pending',
+    paymentMethod: 'Cash On Delivery',
+  });
+
+  console.log(order, 'order service');
+
+  await order.save();
+  return order;
+};
+
+const getAllOrders = async () => {
+  const orders = await Order.find();
+
+  return orders;
 };
 
 const updateOrderStatusIntoDB = async (
   orderId: string,
-  payload: Partial<TOrder>
+  order_status: 'Pending' | 'Canceled' | 'Delivered'
 ) => {
   const order = await Order.findById(orderId);
 
@@ -22,11 +69,13 @@ const updateOrderStatusIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Order not found with this id.');
   }
 
-  const result = await Order.findByIdAndUpdate(orderId, payload, {
-    new: true,
-  });
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { order_status },
+    { new: true, runValidators: true }
+  );
 
-  return result;
+  return updatedOrder;
 };
 
 const getUserOrdersFromDB = async (email: string) => {
@@ -34,7 +83,11 @@ const getUserOrdersFromDB = async (email: string) => {
 
   const result = await Order.find({ userId: user })
     .populate('userId')
-    .populate('productId');
+    .populate({
+      path: 'products.productId', // Populate product details for each product
+      select: 'name price description', // Specify which product fields to return
+    });
+  // .populate('productId');
 
   return result;
 };
@@ -62,14 +115,6 @@ const addRatingForDeliveredProduct = async (
     throw new AppError(
       httpStatus.NOT_FOUND,
       'Order not found or not delivered.'
-    );
-  }
-
-  // Check if the productId in the order matches the provided productId
-  if (order.productId.toString() !== productId.toString()) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      'Product not found in this order.'
     );
   }
 
@@ -101,6 +146,7 @@ const addRatingForDeliveredProduct = async (
 
 export const OrderServices = {
   createOrderIntoDB,
+  getAllOrders,
   updateOrderStatusIntoDB,
   getUserOrdersFromDB,
   addRatingForDeliveredProduct,

@@ -5,7 +5,8 @@ import sendResponse from '../../utils/sendResponse';
 import { OrderServices } from './order.service';
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderServices.createOrderIntoDB(req.body);
+  const { userEmail } = req.user!;
+  const result = await OrderServices.createOrderIntoDB(req.body, userEmail);
 
   sendResponse(res, {
     success: true,
@@ -15,9 +16,21 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderServices.getAllOrders();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Retrieved all Orders successfully done.',
+    data: result,
+  });
+});
+
 const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await OrderServices.updateOrderStatusIntoDB(id, req.body);
+  const { status } = req.body;
+  const result = await OrderServices.updateOrderStatusIntoDB(id, status);
 
   sendResponse(res, {
     success: true,
@@ -60,6 +73,7 @@ const addRatingForDeliveredProduct = catchAsync(
 
 export const OrderControllers = {
   createOrder,
+  getAllOrders,
   updateOrderStatus,
   getUserOrders,
   addRatingForDeliveredProduct,

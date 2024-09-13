@@ -11,7 +11,9 @@ router.post(
   OrderControllers.createOrder
 );
 
-router.put('/:id', auth(USER_ROLE.admin), OrderControllers.updateOrderStatus);
+router.get('/all-orders', auth(USER_ROLE.admin), OrderControllers.getAllOrders);
+
+router.patch('/:id', auth(USER_ROLE.admin), OrderControllers.updateOrderStatus);
 
 router.get('/my-orders', auth(USER_ROLE.user), OrderControllers.getUserOrders);
 

@@ -14,6 +14,9 @@ router.post(
   MobileControllers.createMobile
 );
 
+router.get('/', MobileControllers.getAllMobiles);
+router.get('/:mobileId', MobileControllers.getSingleMobile);
+
 router.put(
   '/:id',
   auth(USER_ROLE.admin),
