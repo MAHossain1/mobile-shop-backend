@@ -11,7 +11,8 @@ const globalErrorHandler_1 = __importDefault(require("./app/config/middlewares/g
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const corsOptions = {
-    origin: 'http://localhost:3000', // Your frontend URL
+    // origin: 'http://localhost:3000', // Your frontend URL
+    origin: 'https://mobile-shop-frontend-gamma.vercel.app', // Your frontend URL
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Allowed HTTP methods
     credentials: true, // Allow credentials like cookies and headers
 };

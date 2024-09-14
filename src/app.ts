@@ -8,7 +8,8 @@ const app: Application = express();
 app.use(express.json());
 
 const corsOptions = {
-  origin: 'http://localhost:3000', // Your frontend URL
+  // origin: 'http://localhost:3000', // Your frontend URL
+  origin: 'https://mobile-shop-frontend-gamma.vercel.app', // Your frontend URL
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Allowed HTTP methods
   credentials: true, // Allow credentials like cookies and headers
 };

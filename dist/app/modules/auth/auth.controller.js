@@ -29,10 +29,11 @@ const auth_service_1 = require("./auth.service");
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../config"));
-const AppError_1 = __importDefault(require("../../errors/AppError"));
-function isJwtPayload(user) {
-    return user !== null && typeof user === 'object';
-}
+// import AppError from '../../errors/AppError';
+// import { JwtPayload } from 'jsonwebtoken';
+// function isJwtPayload(user: any): user is JwtPayload {
+//   return user !== null && typeof user === 'object';
+// }
 const LoginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthServices.LoginUser(req.body);
     const { refreshToken, accessToken, data } = result;
@@ -51,10 +52,11 @@ const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     const passwordData = __rest(req.body, []);
     // Use the type guard function to ensure req.user is a valid JwtPayload
     //   console.log(req.user);
-    if (!isJwtPayload(req.user)) {
-        throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'User not authenticated');
-    }
-    const result = yield auth_service_1.AuthServices.changePassword(req.user, passwordData);
+    // if (!isJwtPayload(req.user)) {
+    //   throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+    // }
+    const { userEmail } = req.user;
+    const result = yield auth_service_1.AuthServices.changePassword(userEmail, passwordData);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_1.default.OK,

@@ -20,6 +20,7 @@ const auth_utils_1 = require("./auth.utils");
 const config_1 = __importDefault(require("../../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const LoginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const user = yield user_model_1.User.isUserExistsByEmail(payload.email);
     // Whether the user exists or not.
     if (!user) {
@@ -31,7 +32,7 @@ const LoginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
     const jwtPayload = {
         userEmail: user.email,
-        role: user.role,
+        role: (_a = user.role) !== null && _a !== void 0 ? _a : 'user',
     };
     // create  accessToken
     const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_token, config_1.default.jwt_access_expires_in);
@@ -43,9 +44,9 @@ const LoginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         data: user,
     };
 });
-const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const changePassword = (userEmail, payload) => __awaiter(void 0, void 0, void 0, function* () {
     //   console.log(userData);
-    const user = yield user_model_1.User.isUserExistsByEmail(userData.userEmail);
+    const user = yield user_model_1.User.isUserExistsByEmail(userEmail);
     //   console.log('user from controller', user);
     // Whether the user exists or not.
     if (!user) {
@@ -64,8 +65,8 @@ const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, 
     // hash new password
     const newHashedPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.bcyrpt_salt_rounds));
     const result = yield user_model_1.User.findOneAndUpdate({
-        email: userData.email,
-        role: userData.role,
+        email: userEmail,
+        role: user.role,
     }, {
         password: newHashedPassword,
     });
