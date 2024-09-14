@@ -5,12 +5,12 @@ import { AuthServices } from './auth.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import config from '../../config';
-import AppError from '../../errors/AppError';
-import { JwtPayload } from 'jsonwebtoken';
+// import AppError from '../../errors/AppError';
+// import { JwtPayload } from 'jsonwebtoken';
 
-function isJwtPayload(user: any): user is JwtPayload {
-  return user !== null && typeof user === 'object';
-}
+// function isJwtPayload(user: any): user is JwtPayload {
+//   return user !== null && typeof user === 'object';
+// }
 
 const LoginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.LoginUser(req.body);
@@ -35,11 +35,13 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 
   // Use the type guard function to ensure req.user is a valid JwtPayload
   //   console.log(req.user);
-  if (!isJwtPayload(req.user)) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
-  }
+  // if (!isJwtPayload(req.user)) {
+  //   throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  // }
 
-  const result = await AuthServices.changePassword(req.user, passwordData);
+  const { userEmail } = req.user!;
+
+  const result = await AuthServices.changePassword(userEmail, passwordData);
 
   sendResponse(res, {
     success: true,

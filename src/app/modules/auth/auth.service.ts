@@ -4,7 +4,6 @@ import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken } from './auth.utils';
 import config from '../../config';
-import { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 const LoginUser = async (payload: TLoginUser) => {
@@ -26,7 +25,7 @@ const LoginUser = async (payload: TLoginUser) => {
 
   const jwtPayload = {
     userEmail: user.email,
-    role: user.role,
+    role: user.role ?? 'user',
   };
 
   // create  accessToken
@@ -51,11 +50,11 @@ const LoginUser = async (payload: TLoginUser) => {
 };
 
 const changePassword = async (
-  userData: JwtPayload,
+  userEmail: string,
   payload: { oldPassword: string; newPassword: string }
 ) => {
   //   console.log(userData);
-  const user = await User.isUserExistsByEmail(userData.userEmail);
+  const user = await User.isUserExistsByEmail(userEmail);
   //   console.log('user from controller', user);
 
   // Whether the user exists or not.
@@ -84,8 +83,8 @@ const changePassword = async (
 
   const result = await User.findOneAndUpdate(
     {
-      email: userData.email,
-      role: userData.role,
+      email: userEmail,
+      role: user.role,
     },
     {
       password: newHashedPassword,

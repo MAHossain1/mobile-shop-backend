@@ -47,7 +47,7 @@ const createOrderIntoDB = async (payload: TOrder, email: string) => {
     paymentMethod: 'Cash On Delivery',
   });
 
-  console.log(order, 'order service');
+  // console.log(order, 'order service');
 
   await order.save();
   return order;
